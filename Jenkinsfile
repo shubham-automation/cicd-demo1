@@ -17,7 +17,7 @@ pipeline {
           // } 
          post {
            always {
-             testNG(reportFilenamePattern: 'test-reports/*.xml')
+             testNG(reportFilenamePattern: '/var/lib/jenkins/jobs/test/builds/8/testng/testng-results.xml')
            }
          }
         }
