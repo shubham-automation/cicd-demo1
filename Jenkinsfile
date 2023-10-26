@@ -13,6 +13,7 @@ pipeline {
             steps {
                 script {
                     sh "ls -lrt"
+                    sh "pip3 install -r requirements.txt"
                     sh "python3 test.py"
                 }
             }
