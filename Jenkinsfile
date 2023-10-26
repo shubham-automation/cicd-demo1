@@ -1,15 +1,8 @@
 pipeline {
     agent any
 
-    stages {
-        // stage('Git Clone') {
-        //     steps {
-        //         // Checkout a specific branch of your Git repository
-        //         git branch: 'your-branch-name', url: 'https://github.com/your/repo.git'
-        //     }
-        // }
-        
-        stage('Docker Build') {
+    stages {        
+        stage('Run Automation Test Cases') {
             steps {
                 script {
                     sh "ls -lrt"
@@ -21,7 +14,12 @@ pipeline {
             always {
               junit 'test-reports/*.xml'
             }
-          }  
+          } 
+         post {
+           always {
+             testNG()
+           }
+         }
         }
     }
 }
