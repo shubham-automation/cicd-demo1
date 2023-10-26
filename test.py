@@ -17,7 +17,7 @@ class TestHello(unittest.TestCase):
     def test_hello_name(self):
         name = 'Shubham'
         my_html = f"<body style='background-color: #4bbee6;'><h1 style='color:  #0a0a0a;'>Hello {name} you are accessing the Blue Version of the app: V1</h1>"
-        rv = self.app.get(f'/hello/{name}')
+        rv = self.app.get(f'/{name}')
         self.assertEqual(rv.status, '200 OK')
         self.assertIn(bytearray(f"{name}", 'utf-8'), rv.data)
 
