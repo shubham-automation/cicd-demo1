@@ -10,14 +10,14 @@ pipeline {
                     sh "python3 test.py"
                 }
             }
-          post {
-            always {
-              junit 'test-reports/*.xml'
-            }
-          } 
+          // post {
+          //   always {
+          //     junit 'test-reports/*.xml'
+          //   }
+          // } 
          post {
            always {
-             testNG()
+             testNG(reportFilenamePattern: 'test-reports/*.xml')
            }
          }
         }
