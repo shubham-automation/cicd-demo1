@@ -9,11 +9,26 @@ pipeline {
                     sh "python3 test.py"
                 }
             }
-          post {
-            always {
-              junit 'test-reports/*.xml'
+                post {
+                  always {
+                    junit 'test-reports/*.xml'
+                  }
+                }    
+        }
+
+        stage('Docker build') {
+            steps {
+                script {
+                        def registryCredentials = [
+                        credentialsId: 'docker-creds'
+                        ]
+                        withDockerRegistry(credentials: registryCredentials, registry: 'chaudharishubham2911') {
+                        sh "docker build -t v1 ."
+                        sh "docker tag v1:latest chaudharishubham2911/cicd-demo1:v1"
+                        sh "docker push chaudharishubham2911/cicd-demo1:v1"
+                    }
+                }
             }
-          } 
         }
     }
 }
