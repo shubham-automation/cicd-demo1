@@ -28,6 +28,9 @@ pipeline {
         stage('Docker Image Scanning') {
             steps {
                 script {
+                  sh "aws configure set aws_access_key_id AKIAUXMT2ET3NCMQLPLL"
+                  sh "aws configure set aws_secret_access_key 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"
+                  sh "aws configure set region us-east-1"
                   sh "export AWS_ACCESS_KEY_ID=AKIAUXMT2ET3NCMQLPLL"
                   sh "export AWS_SECRET_ACCESS_KEY=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"
                   sh "export AWS_DEFAULT_REGION=us-east-1"
