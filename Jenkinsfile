@@ -28,6 +28,9 @@ pipeline {
         stage('Docker Image Scanning') {
             steps {
                 script {
+                  sh "export AWS_ACCESS_KEY_ID=AKIAUXMT2ET3NCMQLPLL"
+                  sh "export AWS_SECRET_ACCESS_KEY=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"
+                  sh "export AWS_DEFAULT_REGION=us-east-1"
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/asff.tpl > asff.tpl"
                   sh "sed -i '1d;\$d' asff.tpl"
