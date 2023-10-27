@@ -21,7 +21,6 @@ pipeline {
                 script {
                   sh "docker build -t ${BRANCH} ."
                   sh "docker tag ${BRANCH}:latest chaudharishubham2911/cicd-demo1:${BRANCH}"
-                  sh "docker push chaudharishubham2911/cicd-demo1:v1"
                 }
             }
         }
