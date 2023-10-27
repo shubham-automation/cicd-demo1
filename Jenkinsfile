@@ -25,11 +25,16 @@ pipeline {
             }
         }
 
-        stage('Image Scanning') {
+        stage('Docker Image Scanning') {
             steps {
                 script {
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
+                  sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/asff.tpl > asff.tpl"
+                  sh "sed -i '1d;\$d' asff.tpl"
+                  sh "aws securityhub list-enabled-products-for-import --region us-east-1 | grep -q aquasecurity && echo "Aqua Security integration has already been enabled in SecurityHub" || { aws securityhub enable-import-findings-for-product --region us-east-1 --product-arn "arn:aws:securityhub:us-east-1::product/aquasecurity/aquasecurity" && echo "Enabled Aqua Security integration in SecurityHub"; }"
                   sh "trivy image --format template --template '@html.tpl' --output trivy_report.html --exit-code 1 --severity HIGH,CRITICAL chaudharishubham2911/cicd-demo1:${BRANCH}"
+                  sh "trivy image --format template --template '@asff.tpl' --output trivy_report.asff --exit-code 1 --severity HIGH,CRITICAL chaudharishubham2911/cicd-demo1:${BRANCH}"
+                  sh "aws securityhub batch-import-findings --findings file://trivy_report.asff --region us-east-1"
                 }
             }
             post {
@@ -45,6 +50,15 @@ pipeline {
                         ])
                     }
              }            
+        }
+
+        stage('Push Image Scanning Result to SecurityHub') {
+            steps {
+                script {
+                  sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
+                  sh "trivy image --format template --template '@html.tpl' --output trivy_report.html --exit-code 1 --severity HIGH,CRITICAL chaudharishubham2911/cicd-demo1:${BRANCH}"
+                }
+            }
         }
 
         stage('Docker Push') {
