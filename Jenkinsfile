@@ -35,7 +35,7 @@ pipeline {
                   sh "export AWS_REGION=us-east-1"
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/asff.tpl > asff.tpl"
                   sh "sed -i 's/{{ env \"AWS_DEFAULT_REGION\" }}/\$AWS_REGION/g' asff.tpl"
-                  sh "sed -i 's/{{ env \"AWS_ACCOUNT_ID\" }}/\"\$aws_account_id"/g' asff.tpl"
+                  sh "sed -i 's/{{ env \"AWS_ACCOUNT_ID\" }}/\"\$aws_account_id\"/g' asff.tpl"
                   sh "sed -i 's/{{ env \"AWS_REGION\" }}/\$AWS_REGION/g' asff.tpl"
                   sh "sed -i '1d;\$d' asff.tpl"
                   sh "cat asff.tpl"
