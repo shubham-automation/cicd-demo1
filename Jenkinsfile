@@ -42,7 +42,7 @@ pipeline {
                   env.AWS_REGION = "us-east-1"
                   env.AWS_ACCOUNT_ID = aws_account_id
                   sh "printenv"
-                  sh "envsubst < asff.tpl > asff.tpl"
+                  sh "envsubst < asff.tpl"
                   sh "sed -i '1d;\$d' asff.tpl"
                   sh "cat asff.tpl"
                 //   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
