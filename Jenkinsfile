@@ -35,13 +35,13 @@ pipeline {
                   def aws_account_id = sh(script: "aws sts get-caller-identity | jq -r '.Account'", returnStdout: true).trim()
                   sh "AWS_REGION=us-east-1"
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/asff.tpl > asff.tpl"
-                  //sh "sed -i 's/{{ env \"AWS_DEFAULT_REGION\" }}/\$AWS_REGION/g' asff.tpl"
-                  //sh "sed -i 's/{{ env \"AWS_ACCOUNT_ID\" }}/\$aws_account_id/g' asff.tpl"
-                  //sh "sed -i \"s/{{ env \"AWS_REGION\" }}/\$AWS_REGION/g\" asff.tpl"
+                  sh "sed -i 's/{{ env \"AWS_DEFAULT_REGION\" }}/\$AWS_REGION/g' asff.tpl"
+                  sh "sed -i 's/{{ env \"AWS_ACCOUNT_ID\" }}/\$aws_account_id/g' asff.tpl"
+                  sh "sed -i \"s/{{ env \"AWS_REGION\" }}/\$AWS_REGION/g\" asff.tpl"
                   env.AWS_DEFAULT_REGION = "us-east-1"
                   env.AWS_REGION = "us-east-1"
                   env.AWS_ACCOUNT_ID = aws_account_id
-
+                  sh "printenv"
                   sh "sed -i '1d;\$d' asff.tpl"
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
                   sh "aws securityhub list-enabled-products-for-import --region us-east-1 | grep -q aquasecurity && echo 'Aqua Security integration has already been enabled in SecurityHub' || { aws securityhub enable-import-findings-for-product --region us-east-1 --product-arn 'arn:aws:securityhub:us-east-1::product/aquasecurity/aquasecurity' && echo 'Enabled Aqua Security integration in SecurityHub'; }"
