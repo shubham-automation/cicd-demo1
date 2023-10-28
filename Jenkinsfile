@@ -43,7 +43,7 @@ pipeline {
                   env.AWS_ACCOUNT_ID = aws_account_id
                   def templateContents = sh(script: 'cat asff.tpl', returnStdout: true).trim()
                   def awsAccountId = aws_account_id
-                  def modifiedTemplate = templateContents.replaceAll('{{ env "AWS_ACCOUNT_ID" }}', awsAccountId)
+                  def modifiedTemplate = templateContents.replaceAll(/\{\{ env "AWS_ACCOUNT_ID" \}\}/, awsAccountId)
                   sh "printenv"
                   sh "envsubst < asff.tpl"
                   sh "sed -i '1d;\$d' asff.tpl"
