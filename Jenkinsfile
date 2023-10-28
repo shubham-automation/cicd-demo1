@@ -43,8 +43,8 @@ pipeline {
                   def awsRegion = "us-east-1"
 
                   def modifiedTemplate = templateContents.replaceAll(/\{\{ env "AWS_ACCOUNT_ID" \}\}/, awsAccountId)
-                  def modifiedTemplate = templateContents.replaceAll(/\{\{ env "AWS_DEFAULT_REGION" \}\}/, awsRegion)
-                  def modifiedTemplate = templateContents.replaceAll(/\{\{ env "AWS_REGION" \}\}/, awsRegion)
+                  modifiedTemplate = templateContents.replaceAll(/\{\{ env "AWS_DEFAULT_REGION" \}\}/, awsRegion)
+                  modifiedTemplate = templateContents.replaceAll(/\{\{ env "AWS_REGION" \}\}/, awsRegion)
                   sh "printenv"
                   sh(script: "echo '$modifiedTemplate' > asff.tpl")
                   sh "sed -i '1d;\$d' asff.tpl"
