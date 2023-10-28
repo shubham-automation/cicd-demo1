@@ -32,7 +32,7 @@ pipeline {
                   sh "aws configure set aws_secret_access_key BpJROxtfe+YDSWIz1FFDOpmQ65NkHpXbMkXUbrCg"
                   sh "aws configure set region us-east-1"
                   sh "aws_account_id=\$(aws sts get-caller-identity | jq -r '.Account')"
-                  def aws_account_id = sh(script: "aws sts get-caller-identity | jq -r '.Account'", returnStatus: true).trim()
+                  def aws_account_id = sh(script: "aws sts get-caller-identity | jq -r '.Account'", returnStdout: true).trim()
                   sh "AWS_REGION=us-east-1"
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/asff.tpl > asff.tpl"
                   //sh "sed -i 's/{{ env \"AWS_DEFAULT_REGION\" }}/\$AWS_REGION/g' asff.tpl"
