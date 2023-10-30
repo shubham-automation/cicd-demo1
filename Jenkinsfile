@@ -66,18 +66,18 @@ pipeline {
              }            
         }
 
-        // stage('Docker Push') {
-        //     steps {
-        //         script {
-        //                 def registryCredentials = [
-        //                 credentialsId: 'docker-creds'
-        //                 ]
-        //                 withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        //                 sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-        //                 sh "docker push chaudharishubham2911/cicd-demo1:${BRANCH}"
-        //             }
-        //         }
-        //     }
-        // }
+         stage('Docker Push') {
+             steps {
+                 script {
+                         def registryCredentials = [
+                         credentialsId: 'docker-creds'
+                         ]
+                         withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                         sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                         sh "docker push chaudharishubham2911/cicd-demo1:${BRANCH}"
+                     }
+                 }
+             }
+         }
     }
 }
