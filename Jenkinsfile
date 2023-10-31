@@ -79,5 +79,56 @@ pipeline {
                  }
              }
          }
+
+         stage('Deploy Application to EKS') {
+             steps {
+                 script {
+                        def greenWeight = input(
+                        id: 'greenWeight',
+                        message: 'Enter a deployment weightage as integer number:',
+                        parameters: [
+                            string(name: 'CustomValue', defaultValue: '', description: 'weightage value')
+                        ],
+                        submitter: 'user'
+                        )
+
+                        echo "User entered: ${greenWeight}"
+                        sh """
+                           #!/bin/bash
+                           if [ -z ${greenWeight} ]; then
+                             echo 'Please provide the deployment weightage as integer number'
+                             exit 1
+                           else
+                              export GREEN_WEIGHT=${greenWeight}
+                              export BLUE_WEIGHT=$((100 - ${greenWeight}))
+                              envsubst < k8s/app.yaml | kubectl apply -f -
+                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                              echo "Variable is not empty"
+                           fi
+                        """
+                        
+                        sh """
+                        #!/bin/bash
+                            kubectl get po | grep myapp-v2 | awk '{print $1}'| xargs kubectl wait --for=condition=Ready pod -n default
+                            api_result=$(kubectl get po -l version=v2 -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham')
+                            if [[ $api_result -eq 200 ]]; then
+                              echo "V2 Application Version is Running Fine......."
+                              export GREEN_WEIGHT=100
+                              export BLUE_WEIGHT=0
+                              export BRANCH=${BRANCH}
+                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                            else
+                              echo "Something Wrong with the V2 Application Version......."
+                              export GREEN_WEIGHT=0
+                              export BLUE_WEIGHT=100
+                              export BRANCH=${V1_BRANCH}
+                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                            fi                           
+                        """
+                     }
+                 }
+             }
+         }
     }
 }
+
