@@ -116,9 +116,9 @@ pipeline {
                         
                         sh """
                         #!/bin/bash
-                            kubectl get po | grep myapp-v2 | awk '{print $1}'| xargs kubectl wait --for=condition=Ready pod -n default
+                            kubectl get po | grep myapp-v2 | awk '{print \$1}'| xargs kubectl wait --for=condition=Ready pod -n default
                             api_result=$(kubectl get po -l version=v2 -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham')
-                            if [[ $api_result -eq 200 ]]; then
+                            if [[ \${api_result} -eq 200 ]]; then
                               echo "V2 Application Version is Running Fine......."
                               export "GREEN_WEIGHT=100"
                               export "BLUE_WEIGHT=0"
@@ -129,7 +129,7 @@ pipeline {
                               echo "Something Wrong with the V2 Application Version......."
                               export "GREEN_WEIGHT=0"
                               export "BLUE_WEIGHT=100"
-                              export "BRANCH=${V1_BRANCH}"
+                              export "BRANCH=v1"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                               echo "Application Rolled Back to Version V1......."
