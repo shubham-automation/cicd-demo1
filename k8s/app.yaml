@@ -34,5 +34,5 @@ spec:
         image: chaudharishubham2911/cicd-demo1:$BRANCH
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 9090
+        - containerPort: 80
 
