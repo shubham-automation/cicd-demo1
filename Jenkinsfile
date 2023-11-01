@@ -105,8 +105,8 @@ pipeline {
                              echo 'Please provide the deployment weightage as integer number'
                              exit 1
                            else
-                              export GREEN_WEIGHT=${greenWeight}
-                              export BLUE_WEIGHT=$((100 - ${greenWeight}))
+                              export "GREEN_WEIGHT=${greenWeight}"
+                              export "BLUE_WEIGHT=`expr 100 - $greenWeight`"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/app.yaml | kubectl apply -f -
                               envsubst < k8s/istio.yaml | kubectl apply -f -
@@ -120,18 +120,19 @@ pipeline {
                             api_result=$(kubectl get po -l version=v2 -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham')
                             if [[ $api_result -eq 200 ]]; then
                               echo "V2 Application Version is Running Fine......."
-                              export GREEN_WEIGHT=100
-                              export BLUE_WEIGHT=0
-                              export BRANCH=${BRANCH}
+                              export "GREEN_WEIGHT=100"
+                              export "BLUE_WEIGHT=0"
+                              export "BRANCH=${BRANCH}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                             else
                               echo "Something Wrong with the V2 Application Version......."
-                              export GREEN_WEIGHT=0
-                              export BLUE_WEIGHT=100
-                              export BRANCH=${V1_BRANCH}
+                              export "GREEN_WEIGHT=0"
+                              export "BLUE_WEIGHT=100"
+                              export "BRANCH=${V1_BRANCH}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/istio.yaml | kubectl apply -f -
+                              echo "Application Rolled Back to Version V1......."
                             fi                           
                         """
                      }
@@ -148,9 +149,9 @@ pipeline {
                  script {
                         sh """
                            #!/bin/bash
-                              export GREEN_WEIGHT=0
-                              export BLUE_WEIGHT=100
-                              export BRANCH=${BRANCH}
+                              export "GREEN_WEIGHT=0"
+                              export "BLUE_WEIGHT=100"
+                              export "BRANCH=${BRANCH}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/app.yaml | kubectl apply -f -
                               envsubst < k8s/istio.yaml | kubectl apply -f -
