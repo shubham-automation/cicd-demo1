@@ -107,6 +107,7 @@ pipeline {
                            else
                               export GREEN_WEIGHT=${greenWeight}
                               export BLUE_WEIGHT=$((100 - ${greenWeight}))
+                              aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/app.yaml | kubectl apply -f -
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                               echo "Variable is not empty"
@@ -122,12 +123,14 @@ pipeline {
                               export GREEN_WEIGHT=100
                               export BLUE_WEIGHT=0
                               export BRANCH=${BRANCH}
+                              aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                             else
                               echo "Something Wrong with the V2 Application Version......."
                               export GREEN_WEIGHT=0
                               export BLUE_WEIGHT=100
                               export BRANCH=${V1_BRANCH}
+                              aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                             fi                           
                         """
@@ -148,6 +151,7 @@ pipeline {
                               export GREEN_WEIGHT=0
                               export BLUE_WEIGHT=100
                               export BRANCH=${BRANCH}
+                              aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/app.yaml | kubectl apply -f -
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                            fi
