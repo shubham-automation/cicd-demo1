@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+  labels:
+    app: myapp
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: myapp
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-$BRANCH
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+      version: $BRANCH
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: $BRANCH
+    spec:
+      containers:
+      - name: myapp
+        image: chaudharishubham2911/cicd-demo1:$BRANCH
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9090
+
