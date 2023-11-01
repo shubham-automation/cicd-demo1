@@ -28,9 +28,9 @@ pipeline {
         stage('Docker Image Scanning') {
             steps {
                 script {
-                  sh "aws configure set aws_access_key_id AKIA2EYQ4XV3FORT2BNR"
-                  sh "aws configure set aws_secret_access_key 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"
-                  sh "aws configure set region us-east-1"
+                //  sh "aws configure set aws_access_key_id AKIA2EYQ4XV3FORT2BNR"
+                //  sh "aws configure set aws_secret_access_key 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"
+                //  sh "aws configure set region us-east-1"
                 //   sh "aws_account_id=\$(aws sts get-caller-identity | jq -r '.Account')"
                 //   def aws_account_id = sh(script: "aws sts get-caller-identity | jq -r '.Account'", returnStdout: true).trim()
                 //   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/asff.tpl > asff.tpl"
