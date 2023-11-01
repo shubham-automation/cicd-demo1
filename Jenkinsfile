@@ -28,8 +28,8 @@ pipeline {
         stage('Docker Image Scanning') {
             steps {
                 script {
-                  sh "aws configure set aws_access_key_id AKIAQD36VAUOSTQAMGIM"
-                  sh "aws configure set aws_secret_access_key 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"
+                  sh "aws configure set aws_access_key_id AKIA2EYQ4XV3FORT2BNR"
+                  sh "aws configure set aws_secret_access_key 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"
                   sh "aws configure set region us-east-1"
                 //   sh "aws_account_id=\$(aws sts get-caller-identity | jq -r '.Account')"
                 //   def aws_account_id = sh(script: "aws sts get-caller-identity | jq -r '.Account'", returnStdout: true).trim()
@@ -80,7 +80,13 @@ pipeline {
              }
          }
 
-         stage('Deploy Application to EKS') {
+         stage('Blue/Green Deployment to EKS') {
+           when {
+             expression {
+               def FRESH_DEPLOYMENT = env.FRESH_DEPLOYMENT
+               return FRESH_DEPLOYMENT == 'No'
+             }
+            }
              steps {
                  script {
                         def greenWeight = input(
@@ -124,6 +130,27 @@ pipeline {
                               export BRANCH=${V1_BRANCH}
                               envsubst < k8s/istio.yaml | kubectl apply -f -
                             fi                           
+                        """
+                     }
+                 }
+
+         stage('Deploy New Application to EKS') {
+           when {
+             expression {
+               def FRESH_DEPLOYMENT = env.FRESH_DEPLOYMENT
+               return FRESH_DEPLOYMENT == 'Yes'
+             }
+            }
+             steps {
+                 script {
+                        sh """
+                           #!/bin/bash
+                              export GREEN_WEIGHT=0
+                              export BLUE_WEIGHT=100
+                              export BRANCH=${BRANCH}
+                              envsubst < k8s/app.yaml | kubectl apply -f -
+                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                           fi
                         """
                      }
                  }
