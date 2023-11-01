@@ -137,7 +137,6 @@ pipeline {
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
                               envsubst < k8s/app.yaml | kubectl apply -f -
                               envsubst < k8s/istio.yaml | kubectl apply -f -
-                           fi
                         """
                      }
                  }
