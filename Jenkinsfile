@@ -137,7 +137,8 @@ pipeline {
                         """
                      }
                  }
-
+            }
+            
          stage('Deploy New Application to EKS') {
            when {
              expression {
