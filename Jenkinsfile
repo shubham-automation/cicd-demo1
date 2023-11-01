@@ -117,8 +117,8 @@ pipeline {
                         sh """
                         #!/bin/bash
                             kubectl get po | grep myapp-v2 | awk '{print \$1}'| xargs kubectl wait --for=condition=Ready pod -n default
-                            api_result=$(kubectl get po -l version=v2 -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham')
-                            if [[ \${api_result} -eq 200 ]]; then
+                            api_result=`kubectl get po -l version=v2 -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham'`
+                            if [[ ${api_result} -eq 200 ]]; then
                               echo "V2 Application Version is Running Fine......."
                               export "GREEN_WEIGHT=100"
                               export "BLUE_WEIGHT=0"
