@@ -16,7 +16,7 @@ pipeline {
             }    
         }
 
-        stage('Docker Build') {
+        stage('Docker Build New App') {
            when {
              expression {
                def FRESH_DEPLOYMENT = env.FRESH_DEPLOYMENT
@@ -46,7 +46,7 @@ pipeline {
             }
         }
 
-        stage('Docker Image Scanning') {
+        stage('Docker Image Scanning New App') {
            when {
              expression {
                def FRESH_DEPLOYMENT = env.FRESH_DEPLOYMENT
@@ -102,7 +102,7 @@ pipeline {
              }            
         }
 
-         stage('Docker Push') {
+         stage('Docker Push New App') {
            when {
              expression {
                def FRESH_DEPLOYMENT = env.FRESH_DEPLOYMENT
@@ -225,4 +225,3 @@ pipeline {
             }
     }
 }
-
