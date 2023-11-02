@@ -12,15 +12,18 @@ pipeline {
             post {
                 always {
                     script {
-                        def testResultFiles = findFiles(glob: 'test-reports/*.xml')
+                        // Create a directory for this build's test results
+                        def buildTestResultsDir = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/test-results"
+                        sh "mkdir -p ${buildTestResultsDir}"
                         
-                        if (testResultFiles) {
-                            archiveArtifacts artifacts: 'test-reports/*.xml', allowEmptyArchive: true
-                            junit testResults: 'test-reports/*.xml'
-                        }
+                        // Copy test result files from the workspace to the build-specific directory
+                        sh "cp -r test-reports/*.xml ${buildTestResultsDir}/"
+                        
+                        // Publish JUnit test results from the build-specific directory
+                        junit '**/test-results/*.xml'
                     }
                 }
-            }   
+            }  
         }
 
         stage('Docker Build New App') {
