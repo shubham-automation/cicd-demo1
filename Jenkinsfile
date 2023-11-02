@@ -10,10 +10,17 @@ pipeline {
                 }
             }
             post {
-              always {
-                junit 'test-reports/*.xml'
-              }
-            }    
+                always {
+                    script {
+                        def testResultFiles = findFiles(glob: 'test-reports/*.xml')
+                        
+                        if (testResultFiles) {
+                            archiveArtifacts artifacts: 'test-reports/*.xml', allowEmptyArchive: true
+                            junit testResults: 'test-reports/*.xml'
+                        }
+                    }
+                }
+            }   
         }
 
         stage('Docker Build New App') {
