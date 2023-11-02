@@ -170,8 +170,10 @@ pipeline {
                               export "GREEN_WEIGHT=${greenWeight}"
                               export "BLUE_WEIGHT=`expr 100 - $greenWeight`"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              envsubst < k8s/app.yaml | kubectl apply -f -
-                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                              jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
+                              jinja k8s/app.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > app-rendered.yaml
+                              envsubst < app-rendered.yaml | kubectl apply -f -
+                              envsubst < istio-rendered.yaml | kubectl apply -f -
                               echo "Variable is not empty"
                            fi
                         """
@@ -186,7 +188,8 @@ pipeline {
                               export "BLUE_WEIGHT=0"
                               export "NEW_APP_VERSION=${NEW_APP_VERSION}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                              jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
+                              envsubst < istio-rendered.yaml | kubectl apply -f -
                               echo "Successfully Upgrade the Application to Version ${NEW_APP_VERSION}"
                             else
                               echo "Something Wrong with the New Application Version ${NEW_APP_VERSION} ......."
@@ -194,7 +197,8 @@ pipeline {
                               export "BLUE_WEIGHT=100"
                               export "CURRENT_APP_VERSION=${CURRENT_APP_VERSION}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                              jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
+                              envsubst < istio-rendered.yaml | kubectl apply -f -
                               echo "Application Rolled Back to Version ${CURRENT_APP_VERSION} ......."
                             fi                           
                         """
@@ -217,8 +221,10 @@ pipeline {
                               export "BLUE_WEIGHT=100"
                               export "CURRENT_APP_VERSION=${CURRENT_APP_VERSION}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              envsubst < k8s/app.yaml | kubectl apply -f -
-                              envsubst < k8s/istio.yaml | kubectl apply -f -
+                              jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
+                              jinja k8s/app.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > app-rendered.yaml
+                              envsubst < app-rendered.yaml | kubectl apply -f -
+                              envsubst < istio-rendered.yaml | kubectl apply -f -
                         """
                      }
                  }
