@@ -13,6 +13,7 @@ spec:
       protocol: HTTP
     hosts:
     - "*"
+    
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -24,29 +25,57 @@ spec:
   gateways:
   - app-gateway
   http:
+{%- if FRESH_DEPLOYMENT == 'Yes' %}    
     - route:
       - destination:
           host: myapp
-          subset: v1
+          port:
+            number: 9090
+          subset: {{ CURRENT_APP_VERSION }}
         weight: $BLUE_WEIGHT
       - destination:
           host: myapp
-          subset: $BRANCH
-        weight: $GREEN_WEIGHT        
+          port:
+            number: 9090
+          subset: {{ CURRENT_APP_VERSION }}
+        weight: $GREEN_WEIGHT
+{%- else %}
+    - route:
+      - destination:
+          host: myapp
+          port:
+            number: 9090
+          subset: {{ CURRENT_APP_VERSION }}
+        weight: $BLUE_WEIGHT
+      - destination:
+          host: myapp
+          port:
+            number: 9090
+          subset: {{ NEW_APP_VERSION }}
+        weight: $GREEN_WEIGHT
+{%- endif %}
 
 ---
-
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: myapp
 spec:
   host: myapp
+{%- if FRESH_DEPLOYMENT == 'Yes' %}
   subsets:
-  - name: v1
+  - name: {{ CURRENT_APP_VERSION }}
     labels:
-      version: v1
-  - name: $BRANCH
+      version: {{ CURRENT_APP_VERSION }}
+  - name: {{ CURRENT_APP_VERSION }}
     labels:
-      version: $BRANCH
-
+      version: {{ CURRENT_APP_VERSION }}
+{%- else %}
+  subsets:
+  - name: {{ CURRENT_APP_VERSION }}
+    labels:
+      version: {{ CURRENT_APP_VERSION }}
+  - name: {{ NEW_APP_VERSION }}
+    labels:
+      version: {{ NEW_APP_VERSION }}
+{%- endif %}

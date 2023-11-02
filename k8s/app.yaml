@@ -7,32 +7,57 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 80
+  - port: 9090
     name: http
   selector:
     app: myapp
 
 ---
+
+{%- if FRESH_DEPLOYMENT == 'Yes' %}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp-$BRANCH
+  name: myapp-{{ CURRENT_APP_VERSION }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: myapp
-      version: $BRANCH
+      version: {{ CURRENT_APP_VERSION }}
   template:
     metadata:
       labels:
         app: myapp
-        version: $BRANCH
+        version: {{ CURRENT_APP_VERSION }}
     spec:
       containers:
       - name: myapp
-        image: chaudharishubham2911/cicd-demo1:$BRANCH
-        imagePullPolicy: IfNotPresent
+        image: chaudharishubham2911/cicd-demo1:{{ CURRENT_APP_VERSION }}
+        imagePullPolicy: Always
         ports:
-        - containerPort: 80
-
+        - containerPort: 9090
+{%- else %}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-{{ NEW_APP_VERSION }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+      version: {{ NEW_APP_VERSION }}
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: {{ NEW_APP_VERSION }}
+    spec:
+      containers:
+      - name: myapp
+        image: chaudharishubham2911/cicd-demo1:{{ NEW_APP_VERSION }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9090
+{%- endif %}

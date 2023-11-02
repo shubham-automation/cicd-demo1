@@ -333,24 +333,25 @@ Resources:
       PolicyName: "eks-policy"
       Roles:
         - !Ref EKSRole
+        - !Ref EKSWorkerRole
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: "Allow"
-            Action: "elasticloadbalancing:SetSubnets"
+            Action: "elasticloadbalancing:*"
             Resource: "*"
+          # - Effect: "Allow"
+          #   Action: "elasticloadbalancing:SetIpAddressType"
+          #   Resource: "*"
           - Effect: "Allow"
-            Action: "elasticloadbalancing:SetIpAddressType"
+            Action: "ec2:*"
             Resource: "*"
-          - Effect: "Allow"
-            Action: "ec2:DescribeInternetGateways"
-            Resource: "*"
-          - Effect: "Allow"
-            Action: "ec2:DescribeAddresses"
-            Resource: "*"
-          - Effect: "Allow"
-            Action: "ec2:DescribeAccountAttributes"
-            Resource: "*"
+          # - Effect: "Allow"
+          #   Action: "ec2:DescribeAddresses"
+          #   Resource: "*"
+          # - Effect: "Allow"
+          #   Action: "ec2:DescribeAccountAttributes"
+          #   Resource: "*"
           - Effect: "Allow"
             Action: "cloudwatch:PutMetricData"
             Resource: "*"
@@ -418,6 +419,8 @@ Resources:
 
   JenkinsInstance:
     Type: AWS::EC2::Instance
+    DependsOn:
+    - NodeGroup
     Properties:
       IamInstanceProfile: !Ref EKSWorkerInstanceProfile
       InstanceType: t3a.medium
@@ -440,6 +443,7 @@ Resources:
           apt-get install fontconfig openjdk-17-jre -y
           apt-get install python3-pip unzip jq -y
           pip3 install urllib3
+          pip3 install jinja-cli
 
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
@@ -540,4 +544,3 @@ Resources:
 
           bin/istioctl install --set profile=demo -y
           kubectl label namespace default istio-injection=enabled
-
