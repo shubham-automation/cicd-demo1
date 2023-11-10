@@ -14,12 +14,12 @@ class TestHello(unittest.TestCase):
         self.assertEqual(rv.status, '200 OK')
         self.assertEqual(rv.data.decode('utf-8'), my_html)
 
-    # def test_hello_name(self):
-    #     name = 'Shubham'
-    #     my_html = f"<body style='background-color: #FF9636;'><h1 style='color:  #0a0a0a;'>Hello {name} you are accessing the Orange Version of the app: V4</h1>"
-    #     rv = self.app.get(f'/{name}')
-    #     self.assertEqual(rv.status, '200 OK')
-    #     self.assertIn(bytearray(f"{name}", 'utf-8'), rv.data)
+    def test_hello_name(self):
+        name = 'Shubham'
+        my_html = f"<body style='background-color: #FF9636;'><h1 style='color:  #0a0a0a;'>Hello {name} you are accessing the Orange Version of the app: V4</h1>"
+        rv = self.app.get(f'/{name}')
+        self.assertEqual(rv.status, '200 OK')
+        self.assertIn(bytearray(f"{name}", 'utf-8'), rv.data)
 
 if __name__ == '__main__':
     import xmlrunner
