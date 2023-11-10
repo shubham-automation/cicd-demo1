@@ -84,7 +84,7 @@ pipeline {
             steps {
                 script {
                   sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
-                  sh "trivy image --format template --template '@html.tpl' --output trivy_report.html --exit-code 0 --severity HIGH,CRITICAL chaudharishubham2911/cicd-demo1:${NEW_APP_VERSION}"
+                  sh "trivy image --format template --template '@html.tpl' --output trivy_report.html --exit-code 1 --severity HIGH,CRITICAL chaudharishubham2911/cicd-demo1:${NEW_APP_VERSION}"
                 }
             }
             post {
