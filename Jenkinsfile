@@ -1,6 +1,9 @@
 pipeline {
     agent any
-
+    environment{
+        ops1 = 'upgrade'
+        ops2 = 'rollback'
+    }
     stages {        
         stage('Run Automation Test Cases') {
             steps {
@@ -178,12 +181,14 @@ pipeline {
                               echo "Variable is not empty"
                            fi
                         """
-                        
+
+                        env.OPERATION = input message: 'Choose operation to perform',
+                        ok: 'Deploy!',
+                        parameters: [choice(name: 'Operation to perform', choices: "${ops1}\n${ops2}", description: 'Which operation do you want to perform?')]
+
                         sh """
                         #!/bin/bash
-                            kubectl get po | grep myapp-${NEW_APP_VERSION} | awk '{print \$1}'| xargs kubectl wait --for=condition=Ready pod -n default
-                            api_result=`kubectl get po -l version=${NEW_APP_VERSION} -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham'`
-                            if [ \${api_result} -eq 200 ]; then
+                            if [ "\${OPERATION}" = 'upgrade' ]; then
                               echo "New Application Version ${NEW_APP_VERSION} is Running Fine So Upgrading it......."
                               export "GREEN_WEIGHT=100"
                               export "BLUE_WEIGHT=0"
