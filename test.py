@@ -9,7 +9,7 @@ class TestHello(unittest.TestCase):
         self.app = app.app.test_client()
 
     def test_hello(self):
-        my_html = f"<body style='background-color: #4bbee6;'><h1 style='color:  #0a0a0a;'>Blue Version: V1</h1>"
+        my_html = f"<body style='background-color: #4bbee6;'><h1 style='color:  #0a0a0a;'>Blue Version: V2</h1>"
         rv = self.app.get('/')
         self.assertEqual(rv.status, '200 OK')
         self.assertEqual(rv.data.decode('utf-8'), my_html)
