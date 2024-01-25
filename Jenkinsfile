@@ -158,7 +158,7 @@ pipeline {
                         id: 'greenWeight',
                         message: 'Enter a deployment weightage as integer number:',
                         parameters: [
-                            string(name: 'CustomValue', defaultValue: '', description: 'Traffic Weightage')
+                            string(name: 'Deployment Weightage', defaultValue: '', description: 'Enter the Deployment Weightage in % for the New Application')
                         ],
                         submitter: 'user'
                         )
