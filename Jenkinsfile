@@ -1,6 +1,9 @@
 pipeline {
     agent any
-
+    environment{
+        ops1 = 'upgrade'
+        ops2 = 'rollback'
+    }
     stages {        
         stage('Run Automation Test Cases') {
             steps {
@@ -155,7 +158,7 @@ pipeline {
                         id: 'greenWeight',
                         message: 'Enter a deployment weightage as integer number:',
                         parameters: [
-                            string(name: 'CustomValue', defaultValue: '', description: 'Traffic Weightage')
+                            string(name: 'Deployment Weightage', defaultValue: '', description: 'Enter the Deployment Weightage in % for the New Application')
                         ],
                         submitter: 'user'
                         )
@@ -170,7 +173,7 @@ pipeline {
                               export "GREEN_WEIGHT=${greenWeight}"
                               export "BLUE_WEIGHT=`expr 100 - $greenWeight`"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              sleep 15
+
                               jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
                               jinja k8s/app.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > app-rendered.yaml
                               envsubst < app-rendered.yaml | kubectl apply -f -
@@ -178,18 +181,19 @@ pipeline {
                               echo "Variable is not empty"
                            fi
                         """
-                        
+
+                        env.OPERATION = input message: 'Choose operation to perform',
+                        ok: 'Deploy!',
+                        parameters: [choice(name: 'Operation to perform', choices: "${ops1}\n${ops2}", description: 'Which operation do you want to perform?')]
+
                         sh """
                         #!/bin/bash
-                            kubectl get po | grep myapp-${NEW_APP_VERSION} | awk '{print \$1}'| xargs kubectl wait --for=condition=Ready pod -n default
-                            api_result=`kubectl get po -l version=${NEW_APP_VERSION} -o custom-columns=:metadata.name | xargs -I {} kubectl exec -ti {} -- bash -c 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9090/shubham'`
-                            if [ \${api_result} -eq 200 ]; then
+                            if [ "\${OPERATION}" = 'upgrade' ]; then
                               echo "New Application Version ${NEW_APP_VERSION} is Running Fine So Upgrading it......."
                               export "GREEN_WEIGHT=100"
                               export "BLUE_WEIGHT=0"
                               export "NEW_APP_VERSION=${NEW_APP_VERSION}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              sleep 15
                               jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
                               envsubst < istio-rendered.yaml | kubectl apply -f -
                               echo "Successfully Upgrade the Application to Version ${NEW_APP_VERSION}"
@@ -199,7 +203,6 @@ pipeline {
                               export "BLUE_WEIGHT=100"
                               export "CURRENT_APP_VERSION=${CURRENT_APP_VERSION}"
                               aws eks update-kubeconfig --name ci-cd-demo1  --region us-east-1
-                              sleep 15
                               jinja k8s/istio.yaml --env NEW_APP_VERSION --env CURRENT_APP_VERSION --env FRESH_DEPLOYMENT > istio-rendered.yaml
                               envsubst < istio-rendered.yaml | kubectl apply -f -
                               echo "Application Rolled Back to Version ${CURRENT_APP_VERSION} ......."
@@ -233,4 +236,10 @@ pipeline {
                  }
             }
     }
+
+        post {
+          always {
+            cleanWs()
+          }
+        }
 }
